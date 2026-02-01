@@ -407,10 +407,10 @@ export default function App() {
             <div className="mt-8">
               <div className="flex flex-col items-center text-center">
                 <div className="text-sm font-medium uppercase tracking-wide text-slate-400">Write</div>
-                <div className="mt-1 text-4xl font-semibold tracking-tight text-slate-100 sm:text-5xl">
-                  {word.english}
+                <div className="mt-1 text-5xl font-semibold tracking-tight text-slate-100 sm:text-6xl">
+                  {word.pinyin}
                 </div>
-                <div className="mt-2 text-sm text-slate-300">{word.pinyin}</div>
+                <div className="mt-2 text-sm text-slate-300">{word.english}</div>
 
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                   <button

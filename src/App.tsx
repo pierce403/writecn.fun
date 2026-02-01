@@ -4,14 +4,11 @@ import { UNIT2_WRITE_WORDS, type Word } from "./data/unit2";
 import { burstConfetti } from "./lib/confetti";
 import { shuffleInPlace } from "./lib/random";
 import { playDing, playPop, playTada } from "./lib/sfx";
-import { speakChineseSequence, speakEnglishSequence, stopSpeech } from "./lib/speech";
-
-type PromptMode = "en" | "cn";
+import { speakChineseSequence, stopSpeech } from "./lib/speech";
 
 const AUDIO_STORAGE_KEY = "writecn.audioEnabled";
-const PROMPT_MODE_STORAGE_KEY = "writecn.promptMode";
 
-const PROMPT_ZH = "请写这个字。";
+const PROMPT_ZH = "这个字怎么写？";
 const STREAK_MILESTONE = 10;
 const NEXT_DELAY_MS = 900;
 const FLASH_DURATION_MS = 650;
@@ -27,17 +24,6 @@ function loadStoredBool(key: string, fallback: boolean): boolean {
   }
 }
 
-function loadStoredString(key: string, fallback: string): string {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const stored = window.localStorage.getItem(key);
-    if (stored === null) return fallback;
-    return stored;
-  } catch {
-    return fallback;
-  }
-}
-
 function storeBool(key: string, value: boolean): void {
   try {
     window.localStorage.setItem(key, String(value));
@@ -46,22 +32,8 @@ function storeBool(key: string, value: boolean): void {
   }
 }
 
-function storeString(key: string, value: string): void {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // ignore
-  }
-}
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
-}
-
-function parsePromptMode(value: string): PromptMode {
-  const normalized = value.trim().toLowerCase();
-  if (normalized === "cn" || normalized === "zh" || normalized === "chinese") return "cn";
-  return "en";
 }
 
 function makeDeck(previousWordId: string | null): string[] {
@@ -87,19 +59,11 @@ export default function App() {
 
   const [started, setStarted] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(() => loadStoredBool(AUDIO_STORAGE_KEY, true));
-  const [promptMode, setPromptMode] = useState<PromptMode>(() => {
-    const stored = loadStoredString(PROMPT_MODE_STORAGE_KEY, "en");
-    return parsePromptMode(stored);
-  });
 
   const audioEnabledRef = useRef(audioEnabled);
-  const promptModeRef = useRef(promptMode);
   useEffect(() => {
     audioEnabledRef.current = audioEnabled;
   }, [audioEnabled]);
-  useEffect(() => {
-    promptModeRef.current = promptMode;
-  }, [promptMode]);
 
   const [word, setWord] = useState<Word | null>(null);
   const [quizKey, setQuizKey] = useState(0);
@@ -217,13 +181,7 @@ export default function App() {
     if (!word) return;
     if (!audioEnabledRef.current) return;
     stopSpeech();
-
-    if (promptModeRef.current === "cn") {
-      void speakChineseSequence([PROMPT_ZH, word.hanzi], { rate: 0.95 });
-      return;
-    }
-
-    void speakEnglishSequence([word.english], { rate: 1 });
+    void speakChineseSequence([PROMPT_ZH, word.hanzi], { rate: 0.95 });
   }
 
   function hintStroke(): void {
@@ -247,10 +205,6 @@ export default function App() {
   useEffect(() => {
     storeBool(AUDIO_STORAGE_KEY, audioEnabled);
   }, [audioEnabled]);
-
-  useEffect(() => {
-    storeString(PROMPT_MODE_STORAGE_KEY, promptMode);
-  }, [promptMode]);
 
   useEffect(() => {
     streakRef.current = streak;
@@ -287,13 +241,7 @@ export default function App() {
     if (!word) return;
     if (!audioEnabledRef.current) return;
     stopSpeech();
-
-    if (promptModeRef.current === "cn") {
-      void speakChineseSequence([PROMPT_ZH, word.hanzi], { rate: 0.95 });
-      return;
-    }
-
-    void speakEnglishSequence([word.english], { rate: 1 });
+    void speakChineseSequence([PROMPT_ZH, word.hanzi], { rate: 0.95 });
   }, [started, word?.id]);
 
   useEffect(() => {
@@ -550,23 +498,6 @@ export default function App() {
             aria-hidden="true"
           />
           Audio {audioEnabled ? "On" : "Off"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setPromptMode((mode) => (mode === "en" ? "cn" : "en"))}
-          className="inline-flex touch-manipulation items-center gap-2 rounded-full bg-slate-800/90 px-4 py-2 text-sm font-medium text-slate-100 shadow-lg ring-1 ring-slate-700/40 backdrop-blur hover:bg-slate-700"
-          aria-pressed={promptMode === "cn"}
-          title="Toggle prompt language"
-        >
-          <span
-            className={[
-              "h-2.5 w-2.5 rounded-full",
-              promptMode === "cn" ? "bg-sky-400" : "bg-amber-300",
-            ].join(" ")}
-            aria-hidden="true"
-          />
-          Prompt {promptMode === "cn" ? "CN" : "EN"}
         </button>
       </div>
 

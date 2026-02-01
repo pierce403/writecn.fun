@@ -18,6 +18,18 @@ body {
   background-size: 100% 100%;
 }
 
+.grid-board svg,
+.grid-board canvas {
+  display: block;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.grid-board svg {
+  pointer-events: all;
+}
+
 @keyframes streak-flash {
   0% {
     opacity: 0;

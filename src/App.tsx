@@ -187,7 +187,7 @@ export default function App() {
   function hintStroke(): void {
     const writer = writerRef.current;
     if (!writer) return;
-    void writer.animateStroke(nextStrokeNumRef.current);
+    void writer.highlightStroke(nextStrokeNumRef.current);
   }
 
   function skipStroke(): void {
@@ -262,10 +262,10 @@ export default function App() {
       padding,
       showOutline: false,
       showCharacter: false,
-      outlineColor: "#334155",
-      strokeColor: "#e2e8f0",
+      outlineColor: "rgba(148, 163, 184, 0.22)",
+      strokeColor: "#cbd5e1",
       drawingColor: "#34d399",
-      highlightColor: "#38bdf8",
+      highlightColor: "rgba(56, 189, 248, 0.45)",
       highlightCompleteColor: "#fbbf24",
       drawingWidth: clamp(Math.round(boardSize * 0.012), 3, 8),
       strokeWidth: clamp(Math.round(boardSize * 0.007), 2, 6),

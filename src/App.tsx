@@ -519,6 +519,13 @@ export default function App() {
         </button>
       </div>
 
+      <a
+        href="https://readcn.fun"
+        className="fixed z-50 text-xs text-slate-400 underline decoration-slate-500/60 underline-offset-4 hover:text-slate-200 [left:calc(theme(spacing.4)+env(safe-area-inset-left))] [bottom:calc(theme(spacing.4)+env(safe-area-inset-bottom))]"
+      >
+        readcn.fun
+      </a>
+
       {streakFlash ? (
         <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center">
           <div

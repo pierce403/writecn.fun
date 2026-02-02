@@ -57,7 +57,7 @@ export default function App() {
     [],
   );
 
-  const [started, setStarted] = useState(true);
+  const [started, setStarted] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(() => loadStoredBool(AUDIO_STORAGE_KEY, true));
 
   const audioEnabledRef = useRef(audioEnabled);
@@ -92,6 +92,7 @@ export default function App() {
   const nextStrokeNumRef = useRef<number>(0);
   const [boardEl, setBoardEl] = useState<HTMLDivElement | null>(null);
   const [boardSize, setBoardSize] = useState(0);
+  const lastPromptedWordIdRef = useRef<string | null>(null);
 
   function clearNextTimeout(): void {
     if (nextTimeoutRef.current === null) return;
@@ -127,7 +128,7 @@ export default function App() {
     }, 520);
   }
 
-  function nextWord(): void {
+  function nextWord(): Word | null {
     clearNextTimeout();
     clearCelebrationTimeouts();
     stopSpeech();
@@ -142,13 +143,14 @@ export default function App() {
     }
 
     const nextId = deckRef.current.pop();
-    if (!nextId) return;
+    if (!nextId) return null;
     lastWordIdRef.current = nextId;
     const next = wordsById[nextId];
-    if (!next) return;
+    if (!next) return null;
 
     setWord(next);
     setQuizKey((key) => key + 1);
+    return next;
   }
 
   function start(): void {
@@ -170,14 +172,20 @@ export default function App() {
     hadMistakeThisWordRef.current = false;
     lastWordIdRef.current = null;
     deckRef.current = makeDeck(null);
-    nextWord();
+    const first = nextWord();
+    if (first) speakPrompt(first);
+  }
+
+  function speakPrompt(nextWord: Word): void {
+    if (!audioEnabledRef.current) return;
+    stopSpeech();
+    lastPromptedWordIdRef.current = nextWord.id;
+    void speakChineseSequence([PROMPT_ZH, nextWord.hanzi], { rate: 0.95 });
   }
 
   function replayPrompt(): void {
     if (!word) return;
-    if (!audioEnabledRef.current) return;
-    stopSpeech();
-    void speakChineseSequence([PROMPT_ZH, word.hanzi], { rate: 0.95 });
+    speakPrompt(word);
   }
 
   function hintStroke(): void {
@@ -235,8 +243,8 @@ export default function App() {
     if (!started) return;
     if (!word) return;
     if (!audioEnabledRef.current) return;
-    stopSpeech();
-    void speakChineseSequence([PROMPT_ZH, word.hanzi], { rate: 0.95 });
+    if (lastPromptedWordIdRef.current === word.id) return;
+    speakPrompt(word);
   }, [started, word?.id]);
 
   useEffect(() => {
@@ -350,10 +358,6 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    start();
-  }, []);
-
   const progressLabel =
     strokeProgress && strokeProgress.total > 0
       ? `${Math.min(strokeProgress.done, strokeProgress.total)} / ${strokeProgress.total} strokes`
@@ -370,7 +374,28 @@ export default function App() {
             </div>
           </header>
 
-          {word ? (
+          {!started ? (
+            <div className="mt-10 text-center">
+              <div className="text-6xl font-semibold leading-none text-slate-200 sm:text-7xl">写字</div>
+
+              <p className="mx-auto mt-4 max-w-md text-sm text-slate-300">
+                You’ll hear a prompt. Draw the character in the box. If you miss, it will show stroke hints until you
+                finish.
+              </p>
+
+              <button
+                type="button"
+                onClick={start}
+                className="mt-8 inline-flex touch-manipulation items-center justify-center rounded-2xl bg-emerald-500 px-6 py-3 text-base font-semibold text-emerald-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              >
+                Start
+              </button>
+
+              <p className="mt-4 text-xs text-slate-400">
+                Tip: browsers require a click before they’ll play speech audio.
+              </p>
+            </div>
+          ) : word ? (
             <div className="mt-8">
               <div className="flex flex-col items-center text-center">
                 <div className="text-sm font-medium uppercase tracking-wide text-slate-400">Write</div>

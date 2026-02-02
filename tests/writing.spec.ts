@@ -6,14 +6,16 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("mounts the writing surface on load", async ({ page }) => {
+test("mounts the writing surface after starting", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: /^Start$/ }).click();
   const target = page.getByTestId("writing-target");
   await expect(target.locator("svg, canvas")).toBeVisible();
 });
 
 test("dragging on the board registers a stroke", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: /^Start$/ }).click();
 
   const target = page.getByTestId("writing-target");
   await expect(target.locator("svg, canvas")).toBeVisible();

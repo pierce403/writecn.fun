@@ -57,7 +57,7 @@ export default function App() {
     [],
   );
 
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(() => loadStoredBool(AUDIO_STORAGE_KEY, true));
 
   const audioEnabledRef = useRef(audioEnabled);
@@ -354,6 +354,10 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    start();
+  }, []);
+
   const progressLabel =
     strokeProgress && strokeProgress.total > 0
       ? `${Math.min(strokeProgress.done, strokeProgress.total)} / ${strokeProgress.total} strokes`
@@ -380,28 +384,7 @@ export default function App() {
             </div>
           </header>
 
-          {!started ? (
-            <div className="mt-10 text-center">
-              <div className="text-6xl font-semibold leading-none text-slate-200 sm:text-7xl">写字</div>
-
-              <p className="mx-auto mt-4 max-w-md text-sm text-slate-300">
-                You’ll hear a prompt. Draw the character in the box. If you miss, it will show stroke hints until you
-                finish.
-              </p>
-
-              <button
-                type="button"
-                onClick={start}
-                className="mt-8 inline-flex touch-manipulation items-center justify-center rounded-2xl bg-emerald-500 px-6 py-3 text-base font-semibold text-emerald-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-              >
-                Start
-              </button>
-
-              <p className="mt-4 text-xs text-slate-400">
-                Tip: browsers require a click before they’ll play speech audio.
-              </p>
-            </div>
-          ) : word ? (
+          {word ? (
             <div className="mt-8">
               <div className="flex flex-col items-center text-center">
                 <div className="text-sm font-medium uppercase tracking-wide text-slate-400">Write</div>
@@ -496,7 +479,12 @@ export default function App() {
                 </div>
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div className="mt-10 flex flex-col items-center justify-center gap-2 text-center">
+              <div className="text-sm text-slate-300">Loading…</div>
+              <div className="text-xs text-slate-500">Pick up a pen and start writing.</div>
+            </div>
+          )}
         </div>
       </div>
 

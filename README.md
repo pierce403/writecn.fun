@@ -1,6 +1,11 @@
-# writecn.fun
+# writecn.fun (deprecated)
 
-A tiny Chinese character writing game (React + TypeScript + Tailwind + HanziWriter), built as static HTML/CSS/JS.
+This repo is deprecated. All functionality has moved to `learncn.fun`:
+
+- Repo: `https://github.com/pierce403/learncn.fun`
+- Site: `https://learncn.fun`
+
+This repo is kept for historical/reference purposes.
 
 ## Local dev
 

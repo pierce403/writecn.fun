@@ -90,7 +90,7 @@ export default function App() {
 
   const writerRef = useRef<HanziWriter | null>(null);
   const nextStrokeNumRef = useRef<number>(0);
-  const boardRef = useRef<HTMLDivElement | null>(null);
+  const [boardEl, setBoardEl] = useState<HTMLDivElement | null>(null);
   const [boardSize, setBoardSize] = useState(0);
 
   function clearNextTimeout(): void {
@@ -215,11 +215,10 @@ export default function App() {
   }, [totalStrokes]);
 
   useEffect(() => {
-    const el = boardRef.current;
-    if (!el) return;
+    if (!boardEl) return;
 
     const update = () => {
-      const rect = el.getBoundingClientRect();
+      const rect = boardEl.getBoundingClientRect();
       const size = Math.floor(Math.min(rect.width, rect.height));
       setBoardSize(size);
     };
@@ -232,9 +231,9 @@ export default function App() {
     }
 
     const ro = new ResizeObserver(() => update());
-    ro.observe(el);
+    ro.observe(boardEl);
     return () => ro.disconnect();
-  }, []);
+  }, [boardEl]);
 
   useEffect(() => {
     if (!started) return;
@@ -248,17 +247,16 @@ export default function App() {
     if (!started) return;
     if (!word) return;
     if (boardSize <= 0) return;
-    const el = boardRef.current;
-    if (!el) return;
+    if (!boardEl) return;
 
     clearNextTimeout();
     writerRef.current?.cancelQuiz();
     writerRef.current = null;
 
-    el.innerHTML = "";
+    boardEl.innerHTML = "";
 
     const padding = clamp(Math.round(boardSize * 0.08), 10, 28);
-    const writer = HanziWriter.create(el, word.hanzi, {
+    const writer = HanziWriter.create(boardEl, word.hanzi, {
       width: boardSize,
       height: boardSize,
       padding,
@@ -345,7 +343,7 @@ export default function App() {
       canceled = true;
       writer.cancelQuiz();
     };
-  }, [started, word?.id, boardSize, quizKey]);
+  }, [started, word?.id, boardSize, quizKey, boardEl]);
 
   useEffect(() => {
     return () => {
@@ -447,15 +445,26 @@ export default function App() {
                   </button>
                 </div>
 
-                {progressLabel ? <div className="mt-4 text-xs text-slate-400">{progressLabel}</div> : null}
+                {progressLabel ? (
+                  <div data-testid="stroke-progress" className="mt-4 text-xs text-slate-400">
+                    {progressLabel}
+                  </div>
+                ) : null}
                 {mistakePulse ? (
                   <div className="mt-2 text-xs text-rose-300">Miss on stroke {mistakePulse.strokeNum + 1}</div>
                 ) : null}
               </div>
 
               <div className="mt-8 flex flex-col items-center">
-                <div className="grid-board aspect-square w-full max-w-[380px] overflow-hidden rounded-3xl bg-slate-950/40 ring-1 ring-slate-700/40">
-                  <div ref={boardRef} className="h-full w-full touch-none select-none" />
+                <div
+                  data-testid="writing-board"
+                  className="grid-board aspect-square w-full max-w-[380px] overflow-hidden rounded-3xl bg-slate-950/40 ring-1 ring-slate-700/40"
+                >
+                  <div
+                    ref={setBoardEl}
+                    data-testid="writing-target"
+                    className="h-full w-full touch-none select-none"
+                  />
                 </div>
               </div>
 
@@ -466,7 +475,9 @@ export default function App() {
                 </div>
                 <div className="rounded-2xl bg-slate-950/40 px-4 py-3 ring-1 ring-slate-700/30">
                   <div className="text-xs text-slate-400">Mistakes</div>
-                  <div className="mt-1 text-lg font-semibold text-slate-100">{mistakeCount}</div>
+                  <div data-testid="mistake-count" className="mt-1 text-lg font-semibold text-slate-100">
+                    {mistakeCount}
+                  </div>
                 </div>
                 <div className="rounded-2xl bg-slate-950/40 px-4 py-3 ring-1 ring-slate-700/30">
                   <div className="text-xs text-slate-400">Perfect streak</div>

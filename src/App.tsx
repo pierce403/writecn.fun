@@ -445,14 +445,21 @@ export default function App() {
                   </button>
                 </div>
 
-                {progressLabel ? (
-                  <div data-testid="stroke-progress" className="mt-4 text-xs text-slate-400">
-                    {progressLabel}
-                  </div>
-                ) : null}
-                {mistakePulse ? (
-                  <div className="mt-2 text-xs text-rose-300">Miss on stroke {mistakePulse.strokeNum + 1}</div>
-                ) : null}
+                <div className="mt-4 flex min-h-10 flex-col items-center justify-center gap-1">
+                  {progressLabel ? (
+                    <div data-testid="stroke-progress" className="text-xs text-slate-400">
+                      {progressLabel}
+                    </div>
+                  ) : (
+                    <div className="h-4" aria-hidden="true" />
+                  )}
+
+                  {mistakePulse ? (
+                    <div className="text-xs text-rose-300">Miss on stroke {mistakePulse.strokeNum + 1}</div>
+                  ) : (
+                    <div className="h-4" aria-hidden="true" />
+                  )}
+                </div>
               </div>
 
               <div className="mt-8 flex flex-col items-center">

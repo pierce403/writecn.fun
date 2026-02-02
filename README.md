@@ -25,3 +25,6 @@ In GitHub:
 1. Repo Settings → Pages
 2. Set Source to **GitHub Actions**
 
+## License
+
+Apache-2.0 (see `LICENSE`).

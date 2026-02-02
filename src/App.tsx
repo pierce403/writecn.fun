@@ -173,10 +173,6 @@ export default function App() {
     nextWord();
   }
 
-  function restart(): void {
-    start();
-  }
-
   function replayPrompt(): void {
     if (!word) return;
     if (!audioEnabledRef.current) return;
@@ -371,16 +367,6 @@ export default function App() {
             <div>
               <h1 className="text-xl font-semibold tracking-tight">writecn.fun</h1>
               <p className="text-sm text-slate-300">Listen, then write the character with correct stroke order.</p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={restart}
-                className="inline-flex touch-manipulation items-center rounded-full bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 ring-1 ring-slate-700/40 hover:bg-slate-700"
-              >
-                Restart
-              </button>
             </div>
           </header>
 
